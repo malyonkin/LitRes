@@ -22,7 +22,7 @@ public class loginPage {
                                     closeWindowPushReserveInter = $(By.className("close"));
 
     @Step
-    public loginPage open() {
+    public loginPage open(String s) {
         Selenide.open("https://www.litres.ru");
         return this;
     }
@@ -70,5 +70,9 @@ public class loginPage {
         pushReserveInter.should(appear);
         closeWindowPushReserveInter.click();
         return this;
+    }
+
+    public void pageForLogin() {
+        Selenide.open("https://www.litres.ru/pages/login/");
     }
 }

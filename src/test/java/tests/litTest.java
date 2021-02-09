@@ -13,12 +13,16 @@ import net.joshka.junit.json.params.JsonFileSource;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.openqa.selenium.By;
 import page.loginPage;
 import page.mainPage;
 import page.pageBook;
 
 import javax.json.JsonObject;
 
+import static com.codeborne.selenide.Condition.appear;
+import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 import static config.userConfig.USER_LOGIN;
 import static config.userConfig.USER_PASSWORD;
@@ -141,8 +145,16 @@ public class litTest {
     @JsonFileSource(resources = "/logins.json") //https://github.com/joshka/junit-json-params
     @DisplayName("IncorrectUser")
     void incorrectLogin(JsonObject object){
-        open("https://www.litres.ru/");
-        loginPage.login(object.getString("user"), object.getString("pwd"));
+        open("https://www.litres.ru/pages/login/");
+        $(By.className("user_container")).click();
+        $(byText("Электронная почта")).click();
+        $(By.name("email")).val(object.getString("key"));
+        $(byText("Продолжить")).click();
+        $(By.name("pwd")).val("646_395"); //579apxg6
+        $(".login-popup__action").click();
+        $(byText("Резервный")).should(appear);
+        $(By.className("close")).click();
+        //loginPage.login(object.getString("key"), object.getString("value"));
         System.out.println(object.get("key"));
         System.out.println(object.get("value"));
     }
