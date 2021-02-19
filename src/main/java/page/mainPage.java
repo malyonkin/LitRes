@@ -55,14 +55,13 @@ public class mainPage {
                                     pushWindow = $(".adult-content-agreement"), //Книги для взрослых. Вы согласны видеть книги с элементами эротики?
                                     sadsa = $(By.id("cookie-agreement")); //Мы используем куки-файлы, чтобы вы могли быстрее и удобнее пользоваться сайтом
 
-    @Step
+    @Step("Open main page")
     public mainPage open() {
         Selenide.open("https://www.litres.ru");
         return this;
     }
-    @Step
-    public mainPage buttonInter() {
+    @Step("Кнопка входа в Профиль")
+    public void buttonInter() {
         userProfile.click();
-        return this;
     }
 }

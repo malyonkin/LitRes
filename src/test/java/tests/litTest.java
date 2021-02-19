@@ -10,7 +10,10 @@ import io.qameta.allure.restassured.AllureRestAssured;
 import io.qameta.allure.selenide.AllureSelenide;
 import io.restassured.RestAssured;
 import net.joshka.junit.json.params.JsonFileSource;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.openqa.selenium.By;
@@ -21,11 +24,12 @@ import page.pageBook;
 import javax.json.JsonObject;
 
 import static com.codeborne.selenide.Condition.appear;
-import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
-import static config.userConfig.USER_LOGIN;
-import static config.userConfig.USER_PASSWORD;
+import static config.userConfig.*;
+import static io.qameta.allure.Allure.step;
 
 @ExtendWith({TextReportExtension.class}) //логирование - https://ru.selenide.org/documentation/reports.html
 public class litTest {
@@ -35,7 +39,7 @@ public class litTest {
 
     //реализровать API тест для получения token сессии
 
-    @BeforeAll
+    /*@BeforeAll
     public static void setUp() {
         String currentBrowser = System.getProperty("selenide.browser", "chrome");
         if ("chrome".equals(currentBrowser)) {
@@ -49,7 +53,7 @@ public class litTest {
         } else if ("opera".equals(currentBrowser)) {
             Configuration.browser = "opera";
         }
-    }
+    }*/
 
     @BeforeEach
     public void setup() {
@@ -106,7 +110,16 @@ public class litTest {
         sleep(1000);
     }*/
 
-    @DisplayName("CorrectLoginEmail")
+    @Owner(value = "МалёнкинAA")
+    @Epic(value = "Пользователь - Страница регистрации, авторизации, профиля, разные типы авторизации/регистрации")
+    @Feature(value = "Окно авторизации")
+    @Story(value = "Авторизация пользователя")
+    @Issue(value = "ТАСК - AUTO-11464")
+    @Tag("SMOKE")
+    @Tag("WEB")
+    @Severity(value = SeverityLevel.CRITICAL)
+    @TmsLinks({@TmsLink(value = "allure-135")})
+    @DisplayName("Валидный логин по E-MAIL")
     @Test
     void loginUser() {
         /*open("");
@@ -118,32 +131,40 @@ public class litTest {
         $(byText("Резервный")).should(appear);
         $(By.className("close")).click();*/
         pageMain.open().buttonInter();
-        loginPage.ChoseEmailAuth();
-        loginPage.enterUsername(USER_LOGIN);
-        loginPage.enterPassword(USER_PASSWORD);
-        loginPage.pushReserveWinClose();
+        loginPage.ChoseEmailAuth()
+                .enterUsername(USER_LOGIN)
+                .enterPassword(USER_PASSWORD)
+                .pushReserveWinClose();
     }
 
     @Test
-    @Owner(value = "Малёнкин")
-    @Epic(value = "ЭПИК Алюр - Функционала Тест. Позволяет группировать тесты по эпикам")
-    @Feature(value = "ФИЧА Алюр - для тестирования структуры Тестовой модели")
-    @Issue(value = "RBCNEW-123") //указывается ID дефекта в баг-треккинговой системе
-    @Tag("smoke")
-    @Severity(value = SeverityLevel.NORMAL)
-    @TmsLinks({@TmsLink(value = "X-ray-135"), @TmsLink(value = "X-ray-136")})
-    @DisplayName("SetRatingBook")
+    @Owner(value = "МалёнкинAA")
+    @Epic(value = "Epic Функционал Райтинг")
+    @Feature(value = "Feature Рейтинг книг")
+    @Story(value = "Story Расчет и отображение рейтинга книги")
+    @Issue(value = "Task - AUTO-123") //указывается ID дефекта в баг-треккинговой системе
+    @Tag("SMOKE")
+    @Tag("WEB")
+    @Severity(value = SeverityLevel.CRITICAL)
+    @TmsLinks({@TmsLink(value = "allure-135"), @TmsLink(value = "X-ray-136")})
+    @DisplayName("Name Set Rating Book")
+    @Description("Выставление рейтинга на выбранную книгу")
     void ratingBooks(){
-        pageBook.open().activeRatingForm(0);
-        pageBook.ratingChose();
-                //.shouldHaveResultRating(0,"3") //ниже тоже самое, только без PO
-        pageBook.ratingNumberClick.get(0).shouldHave(Condition.text("3").because("invalid stars rating"));
+        pageBook.open();
+        pageMain.buttonInter();
+        loginPage.login(USER_LOGIN, USER_PASSWORD);
         pageBook.activeRatingForm(0);
+        pageBook.ratingChose();
+        //.shouldHaveResultRating(0,"3")
+        pageBook.ratingNumberClick.get(0).shouldHave(text("3").because("invalid stars rating")); //этот вариант лучше
+        pageBook.activeRatingForm(0);
+
     }
 
     @ParameterizedTest
+    @DisplayName("Incorrect Inter Users")
     @JsonFileSource(resources = "/logins.json") //https://github.com/joshka/junit-json-params
-    @DisplayName("IncorrectUser")
+    @Description("Скоро будет реализована параметризация с входом, используя разные неволидные данные")
     void incorrectLogin(JsonObject object){
         open("https://www.litres.ru/pages/login/");
         $(By.className("user_container")).click();
@@ -159,11 +180,30 @@ public class litTest {
         System.out.println(object.get("value"));
     }
 
-    /*@ParameterizedTest
-    @DisplayName("loginDifferents")
+    //без использования PO - https://www.youtube.com/watch?app=desktop&v=w5EgCZgj5yE и https://github.com/autotests-cloud/selenide-web-ios-android-tests/blob/master/src/test/java/cloud/autotests/tests/web/LoginTests.java
+    @Test
+    @DisplayName("Valid login without PO")
     void allTypeLogin(){
-        loginPage.open().login("seyewi9798@200cai.com","646_395");
-    }*/
+        //loginPage.open().login("seyewi9798@200cai.com","646_395");
+        step("Go to login page", ()-> {
+            open("https://www.litres.ru/pages/login/");
+            $(byText("Вход в систему")).shouldHave(text("Вход в систему").because("Должна быть надпись 'Вход в систему'"));
+        });
+
+        step("Fill the authorization form", ()-> {
+            $(byId("frm_login")).shouldBe(Condition.visible);
+            $(byName("login")).setValue(USER_LOGIN);
+            $(byId("open_pwd_main")).setValue(USER_PASSWORD);
+            $(byId("login_btn")).click();
+        });
+
+        step("Verify successful authorization", ()-> {
+            $(byId("frm_login")).shouldNot(Condition.exist);
+            $(By.className("user_name")).shouldHave(text(DEFAULT_LOGIN));
+            $(By.className("user_cash")).shouldHave(Condition.ownText("0"));
+        });
+    }
 }
 
 //Запуск тестов из консоли - https://github.com/selenide-examples/google
+//./gradlew clean test; ./gradlew allureServe

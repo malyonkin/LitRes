@@ -15,20 +15,19 @@ public class pageBook {
 
     public static ElementsCollection resultRating = $$(".rating-text-wrapper");
 
-    @Step
+    @Step("Open page book")
     public pageBook open() {
         Selenide.open("https://www.litres.ru/boris-akunin/azazel-spektakl-279062/?rmd=1");
         return this;
     }
-    @Step
+    @Step ("activeRatingForm")
     public pageBook activeRatingForm(int index) {
         ratingNumberClick.get(index).click();
         return this;
     }
-    @Step
-    public pageBook ratingChose() {
+    @Step ("Выставляем рейтинг")
+    public void ratingChose() {
         ratingValue.click();
-        return this;
     }
     @Step
     public pageBook shouldHaveResultRating(int index, String text) {

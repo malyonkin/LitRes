@@ -6,6 +6,7 @@ import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Condition.appear;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
@@ -21,35 +22,35 @@ public class loginPage {
                                     pushReserveInter = $(byText("Резервный")),
                                     closeWindowPushReserveInter = $(By.className("close"));
 
-    @Step
-    public loginPage open(String s) {
-        Selenide.open("https://www.litres.ru");
+    @Step("Open main page")
+    public loginPage open() {
+        Selenide.open("https://www.litres.ru/pages/login/");
         return this;
     }
-    @Step
-    public void ChoseEmailAuth(){
+    @Step ("Выбор e-mail авторизации")
+    public loginPage ChoseEmailAuth(){
         //buttonInter.click();
-        authEmail.click();
+        authEmail.shouldHave(visible).click();
+        return this;
     }
-    @Step
+    @Step("Inter login {text}")
     public loginPage enterUsername(String text) {
         loginUser.val(text);
-        loginButtonInter.click();
+        loginButtonInter.shouldHave(visible).click();
         return this;
     }
-    @Step
+    @Step("Inter password '{0}'")
     public loginPage enterPassword(String text) {
         password.val(text).pressEnter();
         return this;
     }
-    @Step
+    @Step("Закрыть ПУШ окно с предоставлением РЕЗЕРВНЫХ способов авторизации")
     public void pushReserveWinClose() {
         pushReserveInter.should(appear);
         closeWindowPushReserveInter.click();
     }
-    @Step
+    @Step("Inter login {0} and password '{1}'")
     public loginPage login(String user, String pwd){
-        mainPage.buttonInter();
         authEmail.click();
         loginUser.val(user);
         loginButtonInter.click();
@@ -70,9 +71,5 @@ public class loginPage {
         pushReserveInter.should(appear);
         closeWindowPushReserveInter.click();
         return this;
-    }
-
-    public void pageForLogin() {
-        Selenide.open("https://www.litres.ru/pages/login/");
     }
 }
